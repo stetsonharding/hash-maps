@@ -1,3 +1,5 @@
+const { ContactlessOutlined } = require("@material-ui/icons");
+
 //converts key string to number.
 hashStringToInt = (s, tableLength) => {
     //chose a prime number to spread out where the key are stored.
@@ -15,10 +17,29 @@ hashStringToInt = (s, tableLength) => {
 class HashTable {
 //creating array with this syntax beacuse we want array a certain size to start off with.
 //keep track of how many items are in your table.
-table = new Array(2001)
+table = new Array(2006)
 numItems = 0;
 
+//resize table
+resize = () => {
+    const newTable = new Array(this.table.length * 2);
+   
 
+       //re hash every element in the new table.
+       this.table.forEach(item => {
+        if(item){
+           item.forEach(([key,value]) => {
+               const index = hashStringToInt(key, newTable.length)
+               if(newTable[index]){
+                newTable[index].push([key, value])
+                }else{
+                    newTable[index] = [[key, value]]
+                }
+           })
+        }
+    })
+    this.table = newTable
+}
 
 //setting value in array,
 //passing key to hash function to get key converted into int.
@@ -26,7 +47,18 @@ numItems = 0;
 //handling collisions by 'chaining'. instead of storing just the value, 
 //we store the key, and the value inside of an array.
 setItem = (key, value) => {
+    this.numItems++;
+//measure of how full the hash table is allowed to get before its capacity is automatically increased.
+const loadFactor = this.numItems / this.table.length;
 
+
+
+if(loadFactor > .8){
+    // call resize table
+console.log('resizing?')
+    this.resize();
+ 
+}
 
 const index = hashStringToInt(key, this.table.length)
 
@@ -34,7 +66,7 @@ if(this.table[index]){
 this.table[index].push([key, value])
 }else{
     this.table[index] = [[key, value]]
-    this.numItems++;
+ 
 }
 
 
@@ -57,22 +89,16 @@ getItem = (key) => {
    }
 }
 
-const table = new HashTable();
-table.setItem('firstName', 'John')
-// table.getItem('firstName');
-table.setItem('age', 'Doe')
-// table.getItem('lastName');
-table.setItem('lastName', 'Doe')
+const myTable = new HashTable();
 
-// table.setItem('age', '15')
-// table.getItem('age');
-// table.setItem('glaks', 'f')
-// table.getItem('glaks');
-table.setItem('glaks', 'f')
-// table.getItem('glaks');
-// table.setItem('bill', 'f')
-// table.getItem('bill');
-// console.log(table.table)
-console.log(table.numItems)
-// console.log(table.getItem('firstName')) 
-// console.log(table.getItem('lastName')) 
+myTable.setItem('firstName', "John")
+console.log(myTable.getItem('firstName'))
+myTable.setItem('lastName', 'doe')
+console.log(myTable.getItem('lastName'))
+myTable.setItem('age', 22)
+console.log(myTable.getItem('age'))
+console.log(myTable.table)
+console.log('length: ' + myTable.table.length)
+
+
+
