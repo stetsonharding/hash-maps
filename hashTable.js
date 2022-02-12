@@ -1,38 +1,46 @@
-const { ContactlessOutlined } = require("@material-ui/icons");
+/* **Hash Table** */
+//A hash table is a data structure that is used to store keys/value pairs. It uses a hash function to compute an index into an array in which an element will be inserted or searched. 
 
-//converts key string to number.
-hashStringToInt = (s, tableLength) => {
-    //chose a prime number to spread out where the key are stored.
-    //loops through string, get character code for each letter, storing it in hashCode.
-    //modulus stored number by table length so the number does not get to big.
-    //return hashcode.
+
+
+/*Hash function.. Used to Uniquely identify a spacific object from similar objects.*/
+//Creates a uniue key for each object.
+hashStringToInt = (key, tableLength) => {
+    //Chose a prime number to spread out where the keys are stored in table.
     let hashCode = 17;
-    for(let i = 0; i < s.length; i++){
-        hashCode = (13 * hashCode * s.charCodeAt(i)) % tableLength;
+    //loop through key passed in, generate key by charCode and hashing formula.
+    for(let i = 0; i < key.length; i++){
+        hashCode = (13 * hashCode * key.charCodeAt(i)) % tableLength;
     }
     return hashCode;
 }
 
 
+
 class HashTable {
-//creating array with this syntax beacuse we want array a certain size to start off with.
-//keep track of how many items are in your table.
-table = new Array(2006)
+//creating array with this syntax beacuse we want the array a certain size to start off with.
+table = new Array(2000)
+//keeping track of how many items are in table.
 numItems = 0;
 
-//resize table
+///This function will increase the length of the table automatically if ever needed.
 resize = () => {
+    //new table formula to increase size of table to double of current length.
     const newTable = new Array(this.table.length * 2);
-   
 
-       //re hash every element in the new table.
+       //loop through table.
        this.table.forEach(item => {
+           //if there is an item in the table
         if(item){
+            //loop through this items array
            item.forEach(([key,value]) => {
+               //generate new index using hashing function
                const index = hashStringToInt(key, newTable.length)
+               //if new table already has this index, add this item to the array.
                if(newTable[index]){
                 newTable[index].push([key, value])
                 }else{
+                    //create new array to new table
                     newTable[index] = [[key, value]]
                 }
            })
@@ -41,64 +49,62 @@ resize = () => {
     this.table = newTable
 }
 
-//setting value in array,
-//passing key to hash function to get key converted into int.
-//storing value of table index of that hash number.
-//handling collisions by 'chaining'. instead of storing just the value, 
-//we store the key, and the value inside of an array.
+
+
+//creates a new item in table.
 setItem = (key, value) => {
+    //increments the number of items in the table by 1.
     this.numItems++;
-//measure of how full the hash table is allowed to get before its capacity is automatically increased.
+
+//formula of how full the hash table is allowed to get before its capacity is automatically increased.
 const loadFactor = this.numItems / this.table.length;
 
-
-
+//if table is 80% full, call our resize function increase length of table.
 if(loadFactor > .8){
-    // call resize table
-console.log('resizing?')
     this.resize();
- 
 }
 
+ //generate new index using hashing function
 const index = hashStringToInt(key, this.table.length)
 
+  //if table already has this index, add this item to the array.
 if(this.table[index]){
 this.table[index].push([key, value])
 }else{
+      //add new array to table.
     this.table[index] = [[key, value]]
- 
+  }
 }
 
 
-}
 
-
-//getting value in the array, based on the key.
-//passing key to hash function to get converted into int.
-//taking that int and passing it as the index of the array.
-
-//looping through table, finding the key that matches the key being passed in, 
-//returning the 2nd item in the array with the specified key.
+//get spacific item from table based on key passed in.
 getItem = (key) => {
+    //generate index using hashing function
     const index = hashStringToInt(key, this.table.length)
 
+    //if there is nothing in the table with this index 
     if(!this.table[index]){
         return null;
     }
+    //loop through tables at specified index index, look at first element and check if that element is === to key passed in.
+    //if so return the 2nd element of that array (value)
     return this.table[index].find(x => x[0] === key)[1];
    }
 }
 
-const myTable = new HashTable();
 
+
+const myTable = new HashTable();
+/* Testing */
 myTable.setItem('firstName', "John")
-console.log(myTable.getItem('firstName'))
+console.log(myTable.getItem('firstName')) //john
 myTable.setItem('lastName', 'doe')
-console.log(myTable.getItem('lastName'))
+console.log(myTable.getItem('lastName')) // doe
 myTable.setItem('age', 22)
-console.log(myTable.getItem('age'))
-console.log(myTable.table)
-console.log('length: ' + myTable.table.length)
+console.log(myTable.getItem('age')) // 22
+console.log(myTable.numItems) //3 - beacuse we added 3 items to our table.. if this number was 80% of 2000 (our table length) our table would double in size due to the resize function implimented.
+console.log('length: ' + myTable.table.length) // 2000
 
 
 
